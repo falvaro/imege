@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if [[ $# -ne 2 ]]; then
+    echo "Usage: $(basename $0) exp1 exp2" >&2
+    exit 1
+fi
+
+TMP=/tmp/imege$$
+
+trap "rm -f $TMP*" EXIT
+
+#Create temp files with the LaTeX expressions
+echo "$1" > $TMP.exp1
+echo "$2" > $TMP.exp2
+
+#Image generation of expressions
+l2p -o $TMP.img1.png -d 600 -p amsmath,amssymb,amsfonts $TMP.exp1
+l2p -o $TMP.img2.png -d 600 -p amsmath,amssymb,amsfonts $TMP.exp2
+
+#Transformation to PGM
+convert $TMP.img1.png $TMP.rec.pgm
+convert $TMP.img2.png $TMP.ref.pgm
+
+#Set values to [0,255]
+pnmdepth 255 $TMP.rec.pgm > $TMP.rec
+pnmdepth 255 $TMP.ref.pgm > $TMP.ref
+
+#Precision BIDM(exp1,exp2)
+p=$(BIDM/bidm $TMP.rec $TMP.ref 35 31 -i 2)
+#Recall    BIDM(exp2,exp1)
+r=$(BIDM/bidm $TMP.ref $TMP.rec 35 31 -i 2)
+
+#Harmonic mean (f-measure)
+echo $p $r | awk '{
+    if($1==0.0 && $2==0.0)
+      f=0.0
+    else
+      f=2*(($1*$2)/($1+$2))
+    printf("%2.2f\n", 100*(1-f))}'
+
+exit 0
