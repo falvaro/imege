@@ -37,6 +37,7 @@ by Jef Poskanzer. The code is already included, so for compiling it simply:
  2. Go to the BIDM directory containing the source code.
 
  3. Compile the BIDM program
+
         $ make
 
 As a result, you will have the executable file "*bidm*" ready to compute
@@ -59,9 +60,8 @@ Finally, the IMEGE error between the math expressions $x^2+1$ and $x2+1$
 can be computed as
 
     $ ./IMEGE '$x^2+1$' '$x2+1$'
-    $ 25.20
 
-returning an 25.2% visual error.
+returning an 25.20% visual error.
 
 To ensure mathematical representation uniqueness it is recommended to
 add '*\displaystyle*' to every expression in order to avoid the layout
